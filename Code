@@ -1,0 +1,63 @@
+import os
+import pandas as pd
+from functools import partial
+
+# Uncomment the following lines to delete folders if necessary:
+# import shutil
+# shutil.rmtree('I:/' + data_txt)
+
+# Function to create directories and subdirectories based on an Excel file
+def create_folders_and_subfolders(root_path, excel_file):
+    """
+    Create folders and subfolders based on the data from an Excel file.
+
+    Parameters:
+        root_path (str): The root directory where folders will be created.
+        excel_file (str): The path to the Excel file containing folder and subfolder names.
+    """
+    
+    # Read the Excel file
+    folder_data = pd.read_excel(excel_file)
+    print('Reading Excel file...')
+
+    # Loop through the data to create the folders and subfolders
+    print('\nNumber of folders and subfolders to be created: ')
+    print(len(folder_data.index))
+    print('\n')
+    
+    # Create folder paths and subfolder paths based on the Excel data
+    folder_paths = []
+    for idx in folder_data.index:
+        path = os.path.join(folder_data['Folder'][idx], folder_data['Subfolder'][idx])
+        folder_paths.append(path)
+
+    # Create directories
+    concat_root_path = partial(os.path.join, root_path)
+    make_directory = partial(os.makedirs, exist_ok=True)
+
+    # Loop through the list of paths and create directories
+    for path in map(concat_root_path, folder_paths):
+        make_directory(path)
+
+    print('---- Folders and subfolders created successfully!')
+
+# User input for dynamic paths
+def get_user_input():
+    """
+    Prompt the user for input values to set the root directory and the Excel file path.
+    """
+    print("Please enter the full path to the root directory where the folders will be created.")
+    root_path = input("Root directory (e.g., C:/Users/YourName/YourDirectory/): ").strip()
+    
+    print("\nPlease enter the name of the Excel file (including path if not in the same directory).")
+    excel_file = input("Excel file (e.g., folders_data.xlsx): ").strip()
+    
+    return root_path, excel_file
+
+# Main function to run the script
+if __name__ == "__main__":
+    # Get user input for root path and Excel file
+    root_path, excel_file = get_user_input()
+    
+    # Call the function to create the folders and subfolders
+    create_folders_and_subfolders(root_path, excel_file)
